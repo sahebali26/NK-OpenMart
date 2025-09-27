@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NK OpenMart - Online Shopping for Cosmetics, Perfumes & More</title>
+ 	<link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container top-header-content">
+            <div class="top-header-links">
+                <a href="#"><i class="fas fa-question-circle"></i> Help Center</a>
+                <a href="#"><i class="fas fa-shipping-fast"></i> Track Order</a>
+                <a href="#"><i class="fas fa-undo"></i> Return Policy</a>
+            </div>
+            <div class="top-header-links">
+                <a href="#"><i class="fas fa-user"></i> Sign Up</a>
+                <a href="#"><i class="fas fa-sign-in-alt"></i> Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="#" class="logo">NK <span>OpenMart</span></a>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search for products, brands and more...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            
+            <div class="header-nav">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-tags"></i>
+                    <span>Offers</span>
+                </a>
+                <a href="#" class="nav-item" id="cartIcon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Account</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <div class="container">
+        <div class="hero-banner">
+            <div class="hero-slide active" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1607082350899-7e105aa886ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
+                <div class="hero-content">
+                    <h2>Summer Collection 2023</h2>
+                    <p>Up to 50% off on premium cosmetics</p>
+                    <button class="hero-btn">Shop Now</button>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1523293182086-7651a899d37f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
+                <div class="hero-content">
+                    <h2>New Perfumes Arrived</h2>
+                    <p>Discover exclusive fragrances for every occasion</p>
+                    <button class="hero-btn">Explore</button>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');">
+                <div class="hero-content">
+                    <h2>Premium Oils & Baselites</h2>
+                    <p>Natural ingredients for healthy living</p>
+                    <button class="hero-btn">Discover</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="container">
+        <section class="categories">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="categories-grid">
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-palette category-icon"></i>
+                    <h3>Cosmetics</h3>
+                </a>
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-spray-can category-icon"></i>
+                    <h3>Perfumes</h3>
+                </a>
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-gem category-icon"></i>
+                    <h3>Stylish Products</h3>
+                </a>
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-female category-icon"></i>
+                    <h3>Girls' Items</h3>
+                </a>
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-oil-can category-icon"></i>
+                    <h3>Oils</h3>
+                </a>
+                <a href="product.html" class="category-card">
+                    <i class="fas fa-gift category-icon"></i>
+                    <h3>Baselites</h3>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Featured Products -->
+    <div class="container">
+        <section class="featured-products">
+            <h2 class="section-title"New Products</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically added here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-total">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span id="subtotal">₹0</span>
+            </div>
+            <div class="total-row">
+                <span>Shipping:</span>
+                <span>₹40</span>
+            </div>
+            <div class="total-row total-final">
+                <span>Total:</span>
+                <span id="total">₹40</span>
+            </div>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Checkout</h3>
+                <button class="close-cart" id="closeModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Delivery Address</label>
+                        <textarea id="address" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" required>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h4>Order Summary</h4>
+                        <div id="modalOrderSummary">
+                            <!-- Order summary will be dynamically added here -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancelOrder">Cancel</button>
+                <button class="place-order-btn" id="placeOrder">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>NK OpenMart</h3>
+                    <p>Your one-stop destination for premium cosmetics, perfumes, and lifestyle products.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">Categories</a></li>
+                        <li><a href="#">Offers</a></li>
+                        <li><a href="#">New Arrivals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Return Policy</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Abhayapuri, Assam, India</li>
+                        <li><i class="fas fa-phone"></i> +91 6003816583</li>
+                        <li><i class="fas fa-envelope"></i> support@nkopemart.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 NK OpenMart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+   <script src="script.js"></script>
+
+</body>
+</html>
