@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - OpenMart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shopping-bag me-2"></i>
+                OpenMart
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.html">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="categories.html">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="wishlist.html">
+                            <i class="fas fa-heart"></i>
+                            <span class="wishlist-count">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">0</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Checkout Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Checkout Process</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Checkout Steps -->
+                            <div class="checkout-steps mb-5">
+                                <div class="checkout-step active">
+                                    <div class="step-number">1</div>
+                                    <div class="step-title">Customer Info</div>
+                                </div>
+                                <div class="checkout-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-title">Order Review on WP</div>
+                                </div>
+                                <div class="checkout-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-title">Confirmation on WP</div>
+                                </div>
+                            </div>
+
+                            <!-- Checkout Form -->
+                            <form id="checkoutForm">
+                                <h5 class="mb-3">Customer Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">Email Address *</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label">Phone Number *</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="shippingMethod" class="form-label">Shipping Method</label>
+                                        <select class="form-select" id="shippingMethod" name="shippingMethod">
+                                            <option value="standard">Standard Delivery (3-5 days) - ₹50</option>
+                                            <option value="express">Express Delivery (1-2 days) - ₹150</option>
+                                            <option value="overnight">Overnight Delivery - ₹300</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <h5 class="mb-3 mt-4">Shipping Address</h5>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Street Address *</label>
+                                    <input type="text" class="form-control" id="address" name="address" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="city" class="form-label">City *</label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="state" class="form-label">State *</label>
+                                        <input type="text" class="form-control" id="state" name="state" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="zip" class="form-label">ZIP Code *</label>
+                                        <input type="text" class="form-control" id="zip" name="zip" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="saveInfo">
+                                    <label class="form-check-label" for="saveInfo">
+                                        Save this information for next time
+                                    </label>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fab fa-whatsapp me-2"></i>
+                                        Complete Order via WhatsApp
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="order-summary">
+                                <!-- Order items will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support Info -->
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h6><i class="fas fa-headset me-2 text-primary"></i>Need Help?</h6>
+                            <p class="small mb-2">Contact our customer support team</p>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-phone-alt me-2 text-muted"></i>
+                                <span>+91 6003816583</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope me-2 text-muted"></i>
+                                <span>support@openmart.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>OpenMart</h5>
+                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white-50">Home</a></li>
+                        <li><a href="products.html" class="text-white-50">Products</a></li>
+                        <li><a href="categories.html" class="text-white-50">Categories</a></li>
+                        <li><a href="about.html" class="text-white-50">About Us</a></li>
+                        <li><a href="contact.html" class="text-white-50">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Customer Service</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="faq.html" class="text-white-50">FAQ</a></li>
+                        <li><a href="shipping.html" class="text-white-50">Shipping Info</a></li>
+                        <li><a href="returns.html" class="text-white-50">Returns & Refunds</a></li>
+                        <li><a href="privacy.html" class="text-white-50">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-white-50">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Newsletter</h5>
+                    <p class="text-white-50">Subscribe to get updates on new products and special offers.</p>
+                    <form class="newsletter-form">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2023 OpenMart. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <img src="images/payment-methods.png" alt="Payment Methods" class="img-fluid" style="max-height: 30px;">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/6003816583" class="whatsapp-button" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
