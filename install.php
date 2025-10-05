@@ -1,258 +1,352 @@
 <?php
-require_once 'config/database.php';
+// OpenMart Installation Script
+// This script will set up the complete database and initial data
 
-try {
-    $db = new Database();
-    $conn = $db->getConnection();
-    
-    // Create tables
-    $sql = "
-    SET FOREIGN_KEY_CHECKS=0;
-    
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        phone VARCHAR(20),
-        address TEXT,
-        city VARCHAR(100),
-        state VARCHAR(100),
-        zip_code VARCHAR(20),
-        role ENUM('customer', 'admin') DEFAULT 'customer',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS categories (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        slug VARCHAR(100) UNIQUE NOT NULL,
-        description TEXT,
-        image VARCHAR(255),
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS products (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) UNIQUE NOT NULL,
-        description TEXT,
-        short_description TEXT,
-        price DECIMAL(10,2) NOT NULL,
-        compare_price DECIMAL(10,2),
-        cost_price DECIMAL(10,2),
-        sku VARCHAR(100) UNIQUE,
-        barcode VARCHAR(100),
-        category_id INT,
-        image VARCHAR(255),
-        gallery TEXT,
-        stock_quantity INT DEFAULT 0,
-        low_stock_threshold INT DEFAULT 5,
-        is_featured BOOLEAN DEFAULT FALSE,
-        is_active BOOLEAN DEFAULT TRUE,
-        weight DECIMAL(8,2),
-        dimensions VARCHAR(100),
-        meta_title VARCHAR(255),
-        meta_description TEXT,
-        tags TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-    );
-    
-    CREATE TABLE IF NOT EXISTS cart (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        product_id INT NOT NULL,
-        quantity INT DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        UNIQUE KEY unique_cart_item (user_id, product_id)
-    );
-    
-    CREATE TABLE IF NOT EXISTS wishlist (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        product_id INT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        UNIQUE KEY unique_wishlist_item (user_id, product_id)
-    );
-    
-    CREATE TABLE IF NOT EXISTS orders (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        order_number VARCHAR(50) UNIQUE NOT NULL,
-        total_amount DECIMAL(10,2) NOT NULL,
-        shipping_amount DECIMAL(10,2) DEFAULT 0,
-        tax_amount DECIMAL(10,2) DEFAULT 0,
-        discount_amount DECIMAL(10,2) DEFAULT 0,
-        final_amount DECIMAL(10,2) NOT NULL,
-        status ENUM('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded') DEFAULT 'pending',
-        payment_method ENUM('cod', 'card', 'upi', 'netbanking') DEFAULT 'cod',
-        payment_status ENUM('pending', 'paid', 'failed', 'refunded') DEFAULT 'pending',
-        shipping_address TEXT,
-        billing_address TEXT,
-        customer_notes TEXT,
-        admin_notes TEXT,
-        tracking_number VARCHAR(100),
-        shipped_at TIMESTAMP NULL,
-        delivered_at TIMESTAMP NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    
-    CREATE TABLE IF NOT EXISTS order_items (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        order_id INT NOT NULL,
-        product_id INT NOT NULL,
-        product_name VARCHAR(255) NOT NULL,
-        product_price DECIMAL(10,2) NOT NULL,
-        quantity INT NOT NULL,
-        total_price DECIMAL(10,2) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-    );
-    
-    CREATE TABLE IF NOT EXISTS reviews (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        product_id INT NOT NULL,
-        user_id INT NOT NULL,
-        rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-        title VARCHAR(255),
-        comment TEXT,
-        is_approved BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        UNIQUE KEY unique_product_review (product_id, user_id)
-    );
-    
-    CREATE TABLE IF NOT EXISTS coupons (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        code VARCHAR(50) UNIQUE NOT NULL,
-        description TEXT,
-        discount_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
-        discount_value DECIMAL(10,2) NOT NULL,
-        minimum_amount DECIMAL(10,2) DEFAULT 0,
-        maximum_discount DECIMAL(10,2),
-        usage_limit INT DEFAULT NULL,
-        used_count INT DEFAULT 0,
-        valid_from DATE,
-        valid_until DATE,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        is_active BOOLEAN DEFAULT TRUE,
-        subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    SET FOREIGN_KEY_CHECKS=1;
-    ";
-    
-    $conn->exec($sql);
-    
-    // Insert admin user
-    $password = password_hash('admin123', PASSWORD_DEFAULT);
-    $admin_sql = "INSERT IGNORE INTO users (name, email, password, role) VALUES 
-                 ('Admin User', 'admin@openmart.com', '$password', 'admin')";
-    $conn->exec($admin_sql);
-    
-    // Insert sample categories
-    $categories_sql = "INSERT IGNORE INTO categories (name, slug, description) VALUES 
-                      ('Cosmetics', 'cosmetics', 'Beauty and cosmetic products for daily care and special occasions'),
-                      ('Ladies Products', 'ladies-products', 'Exclusive products designed for women including fashion and accessories'),
-                      ('Daily Uses', 'daily-uses', 'Essential everyday products for household and personal care'),
-                      ('Electronics', 'electronics', 'Latest gadgets and electronic devices'),
-                      ('Fashion', 'fashion', 'Trendy clothing and fashion accessories')";
-    $conn->exec($categories_sql);
-    
-    // Insert sample products
-    $products_sql = "INSERT IGNORE INTO products (name, slug, description, short_description, price, compare_price, category_id, stock_quantity, is_featured, sku) VALUES 
-                    ('Premium Matte Lipstick', 'premium-matte-lipstick', 'Long-lasting matte lipstick with rich color payoff. Waterproof and transfer-proof formula.', 'Rich color matte lipstick', 499.00, 599.00, 1, 50, 1, 'LIP001'),
-                    ('Designer Leather Handbag', 'designer-leather-handbag', 'Genuine leather handbag with multiple compartments. Perfect for daily use or special occasions.', 'Genuine leather handbag', 1299.00, 1599.00, 2, 25, 1, 'BAG001'),
-                    ('Silver Plated Ring', 'silver-plated-ring', 'Elegant silver plated ring with crystal stones. Adjustable size for perfect fit.', 'Elegant silver ring', 699.00, 899.00, 2, 100, 0, 'RING001'),
-                    ('5-Piece Kitchen Utensil Set', 'kitchen-utensil-set', 'Stainless steel kitchen utensil set including spatula, ladle, spoon, and more. Ergonomic handles.', 'Complete kitchen tool set', 799.00, 999.00, 3, 30, 1, 'KIT001'),
-                    ('Organic Face Cream', 'organic-face-cream', '100% organic face cream with aloe vera and vitamin E. Suitable for all skin types.', 'Natural face moisturizer', 349.00, 449.00, 1, 75, 0, 'CRM001'),
-                    ('Wireless Earbuds', 'wireless-earbuds', 'Bluetooth 5.0 wireless earbuds with charging case. 20 hours battery life with noise cancellation.', 'High-quality audio earbuds', 1599.00, 1999.00, 4, 40, 1, 'EAR001'),
-                    ('Cotton T-Shirt Pack', 'cotton-tshirt-pack', 'Pack of 3 premium cotton t-shirts. Available in multiple colors. Machine washable.', 'Comfortable cotton t-shirts', 899.00, 1099.00, 5, 60, 0, 'TSH001')";
-    $conn->exec($products_sql);
-    
-    echo "<!DOCTYPE html>
-    <html lang='en'>
+// Error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Check if already installed
+if (file_exists('config/database.php') && !isset($_GET['force'])) {
+    die('
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>OpenMart Installation</title>
-        <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMart - Already Installed</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
             .installation-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         </style>
     </head>
     <body>
-        <div class='container'>
-            <div class='row justify-content-center'>
-                <div class='col-md-8'>
-                    <div class='installation-card p-5 my-5'>
-                        <div class='text-center mb-4'>
-                            <h1 class='text-primary'><i class='fas fa-shopping-cart'></i> OpenMart</h1>
-                            <p class='lead'>E-commerce Platform Installation</p>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="installation-card p-5 my-5 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle fa-5x text-success"></i>
                         </div>
-                        
-                        <div class='alert alert-success'>
-                            <h4><i class='fas fa-check-circle'></i> Installation Successful!</h4>
-                            <p>Database tables created successfully with sample data.</p>
+                        <h2 class="text-primary">OpenMart Already Installed</h2>
+                        <p class="lead">Your OpenMart e-commerce platform is already set up and ready to use.</p>
+                        <div class="mt-4">
+                            <a href="index.html" class="btn btn-primary me-2">Visit Website</a>
+                            <a href="admin/dashboard.html" class="btn btn-outline-primary me-2">Admin Panel</a>
+                            <a href="install.php?force=1" class="btn btn-warning">Reinstall</a>
                         </div>
-                        
-                        <div class='row mt-4'>
-                            <div class='col-md-6'>
-                                <div class='card'>
-                                    <div class='card-body'>
-                                        <h5>Admin Access</h5>
-                                        <p><strong>Email:</strong> admin@openmart.com</p>
-                                        <p><strong>Password:</strong> admin123</p>
-                                        <a href='admin/dashboard.html' class='btn btn-primary btn-sm'>Go to Admin Panel</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class='col-md-6'>
-                                <div class='card'>
-                                    <div class='card-body'>
-                                        <h5>Website</h5>
-                                        <p>Explore the frontend of your new e-commerce store</p>
-                                        <a href='index.html' class='btn btn-outline-primary btn-sm'>Visit Website</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class='alert alert-warning mt-4'>
-                            <h6><i class='fas fa-exclamation-triangle'></i> Security Notice</h6>
-                            <p class='mb-0'>For security reasons, please delete or rename the <code>install.php</code> file after installation.</p>
+                        <div class="alert alert-warning mt-4">
+                            <strong>Warning:</strong> Reinstalling will reset your database and delete all existing data.
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js'></script>
     </body>
-    </html>";
+    </html>
+    ');
+}
+
+// Installation form handler
+if ($_POST['install'] ?? false) {
+    $db_host = $_POST['db_host'] ?? 'localhost';
+    $db_name = $_POST['db_name'] ?? 'openmart';
+    $db_user = $_POST['db_user'] ?? 'root';
+    $db_pass = $_POST['db_pass'] ?? '';
+    $admin_email = $_POST['admin_email'] ?? 'admin@openmart.com';
+    $admin_password = $_POST['admin_password'] ?? 'admin123';
     
-} catch(PDOException $e) {
-    echo "<div class='alert alert-danger'>Installation failed: " . $e->getMessage() . "</div>";
+    try {
+        // Test database connection
+        $pdo = new PDO("mysql:host=$db_host", $db_user, $db_pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Create database if not exists
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
+        $pdo->exec("USE `$db_name`");
+        
+        // Read and execute SQL setup file
+        $sql_file = 'database/setup.sql';
+        if (!file_exists($sql_file)) {
+            throw new Exception("Database setup file not found: $sql_file");
+        }
+        
+        $sql = file_get_contents($sql_file);
+        $pdo->exec($sql);
+        
+        // Update admin user with provided credentials
+        $hashed_password = password_hash($admin_password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE role = 'admin' LIMIT 1");
+        $stmt->execute([$admin_email, $hashed_password]);
+        
+        // Update database configuration
+        $config_content = '<?php
+class Database {
+    private $host = "' . $db_host . '";
+    private $db_name = "' . $db_name . '";
+    private $username = "' . $db_user . '";
+    private $password = "' . $db_pass . '";
+    public $conn;
+
+    public function getConnection() {
+        $this->conn = null;
+        try {
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->conn->exec("set names utf8");
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+        }
+        return $this->conn;
+    }
+}
+?>';
+        
+        file_put_contents('config/database.php', $config_content);
+        
+        // Create installed flag file
+        file_put_contents('config/installed.flag', date('Y-m-d H:i:s'));
+        
+        // Show success message
+        showSuccess($admin_email, $admin_password);
+        
+    } catch (Exception $e) {
+        showError($e->getMessage());
+    }
+    
+    exit;
+}
+
+// Show installation form
+showInstallationForm();
+
+function showInstallationForm() {
+    echo '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMart Installation</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
+            .installation-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+            .step-indicator { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+            .step { flex: 1; text-align: center; padding: 10px; position: relative; }
+            .step.active .step-number { background: #4e73df; color: white; }
+            .step-number { width: 40px; height: 40px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="installation-card p-4 p-md-5 my-5">
+                        <div class="text-center mb-4">
+                            <h1 class="text-primary"><i class="fas fa-shopping-cart"></i> OpenMart</h1>
+                            <p class="lead">E-commerce Platform Installation</p>
+                        </div>
+                        
+                        <div class="step-indicator">
+                            <div class="step active">
+                                <div class="step-number">1</div>
+                                <div>Database</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div>Admin</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div>Complete</div>
+                            </div>
+                        </div>
+                        
+                        <form method="POST" id="installForm">
+                            <input type="hidden" name="install" value="1">
+                            
+                            <h4 class="mb-3">Database Configuration</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="db_host" class="form-label">Database Host *</label>
+                                    <input type="text" class="form-control" id="db_host" name="db_host" value="localhost" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="db_name" class="form-label">Database Name *</label>
+                                    <input type="text" class="form-control" id="db_name" name="db_name" value="openmart" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="db_user" class="form-label">Database Username *</label>
+                                    <input type="text" class="form-control" id="db_user" name="db_user" value="root" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="db_pass" class="form-label">Database Password</label>
+                                    <input type="password" class="form-control" id="db_pass" name="db_pass">
+                                </div>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <h4 class="mb-3">Admin Account</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="admin_email" class="form-label">Admin Email *</label>
+                                    <input type="email" class="form-control" id="admin_email" name="admin_email" value="admin@openmart.com" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="admin_password" class="form-label">Admin Password *</label>
+                                    <input type="password" class="form-control" id="admin_password" name="admin_password" value="admin123" required>
+                                    <div class="form-text">Minimum 6 characters</div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> System Requirements</h6>
+                                <ul class="mb-0">
+                                    <li>PHP 7.4 or higher</li>
+                                    <li>MySQL 5.7 or higher</li>
+                                    <li>PDO MySQL Extension</li>
+                                    <li>GD Library for image processing</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-download me-2"></i>Install OpenMart
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>';
+}
+
+function showSuccess($admin_email, $admin_password) {
+    echo '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMart - Installation Successful</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
+            .installation-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="installation-card p-5 my-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+                            <h1 class="text-primary">Installation Successful!</h1>
+                            <p class="lead">Your OpenMart e-commerce platform is ready to use.</p>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <h4><i class="fas fa-check-circle"></i> Setup Completed</h4>
+                            <p>Database tables created successfully with sample data.</p>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Admin Access</h5>
+                                        <div class="mb-3">
+                                            <strong>Email:</strong> ' . htmlspecialchars($admin_email) . '<br>
+                                            <strong>Password:</strong> ' . htmlspecialchars($admin_password) . '
+                                        </div>
+                                        <a href="admin/dashboard.html" class="btn btn-primary">Go to Admin Panel</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Website</h5>
+                                        <p class="card-text">Explore the frontend of your new e-commerce store</p>
+                                        <a href="index.html" class="btn btn-outline-primary">Visit Website</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-4">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Security Notice</h6>
+                            <p class="mb-0">
+                                <strong>Important:</strong> For security reasons, please delete or rename the <code>install.php</code> file after installation.
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5>Next Steps:</h5>
+                            <ol>
+                                <li>Configure your payment gateway in admin panel</li>
+                                <li>Set up shipping methods and rates</li>
+                                <li>Add your products and categories</li>
+                                <li>Configure email settings for notifications</li>
+                                <li>Test the complete checkout process</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>';
+}
+
+function showError($message) {
+    echo '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OpenMart - Installation Error</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
+            .installation-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="installation-card p-5 my-5 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-exclamation-triangle fa-5x text-danger"></i>
+                        </div>
+                        <h2 class="text-danger">Installation Failed</h2>
+                        <div class="alert alert-danger mt-3">
+                            <strong>Error:</strong> ' . htmlspecialchars($message) . '
+                        </div>
+                        <p class="mt-3">Please check your database credentials and try again.</p>
+                        <div class="mt-4">
+                            <a href="install.php" class="btn btn-primary">Try Again</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>';
 }
 ?>
