@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management - OpenMart Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Admin Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="dashboard.html">
+                    <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>OpenMart Admin</h4>
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="../index.html" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i> View Store
+                    </a>
+                    <a class="nav-link" href="../logout.html">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid" style="margin-top: 76px;">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block admin-sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="products.html">
+                                <i class="fas fa-box me-2"></i>
+                                Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="categories.html">
+                                <i class="fas fa-tags me-2"></i>
+                                Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="orders.html">
+                                <i class="fas fa-shopping-bag me-2"></i>
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="customers.html">
+                                <i class="fas fa-users me-2"></i>
+                                Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="analytics.html">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Analytics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 admin-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Orders Management</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-download me-2"></i>Export Orders
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Stats -->
+                <div class="row mb-4">
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Total Orders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">1,248</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-shopping-bag fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Completed
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">856</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Pending
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">142</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Processing
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">189</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-cog fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-secondary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                            Shipped
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">61</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-md-4 col-6 mb-3">
+                        <div class="card border-left-danger shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                            Cancelled
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">32</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Search orders..." id="orderSearch">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" id="dateFrom" placeholder="From Date">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" id="dateTo" placeholder="To Date">
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary me-2">Filter</button>
+                        <button class="btn btn-outline-secondary">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="ordersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong>#ORD-1248</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-bold">Rahul Verma</div>
+                                                <small class="text-muted">rahul@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>Jan 15, 2024</td>
+                                        <td>
+                                            <div class="fw-bold">₹1,798</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Paid</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" data-order-id="1248">
+                                                <option value="pending">Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="processing" selected>Processing</option>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="delivered">Delivered</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Process Order">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" title="Print Invoice">
+                                                    <i class="fas fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>#ORD-1247</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-bold">Anita Patel</div>
+                                                <small class="text-muted">anita@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>Jan 15, 2024</td>
+                                        <td>
+                                            <div class="fw-bold">₹2,497</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning">COD</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" data-order-id="1247">
+                                                <option value="pending">Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="processing">Processing</option>
+                                                <option value="shipped" selected>Shipped</option>
+                                                <option value="delivered">Delivered</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Process Order">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" title="Print Invoice">
+                                                    <i class="fas fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>#ORD-1246</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-bold">Priya Sharma</div>
+                                                <small class="text-muted">priya@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>Jan 14, 2024</td>
+                                        <td>
+                                            <div class="fw-bold">₹899</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Paid</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" data-order-id="1246">
+                                                <option value="pending">Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="processing">Processing</option>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="delivered" selected>Delivered</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Process Order">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" title="Print Invoice">
+                                                    <i class="fas fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>#ORD-1245</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-bold">Sanjay Kumar</div>
+                                                <small class="text-muted">sanjay@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>Jan 14, 2024</td>
+                                        <td>
+                                            <div class="fw-bold">₹3,299</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Paid</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" data-order-id="1245">
+                                                <option value="pending" selected>Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="processing">Processing</option>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="delivered">Delivered</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Process Order">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" title="Print Invoice">
+                                                    <i class="fas fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>#ORD-1244</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-bold">Meera Singh</div>
+                                                <small class="text-muted">meera@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>Jan 13, 2024</td>
+                                        <td>
+                                            <div class="fw-bold">₹1,499</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger">Failed</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select" data-order-id="1244">
+                                                <option value="pending">Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="processing">Processing</option>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="delivered">Delivered</option>
+                                                <option value="cancelled" selected>Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" title="Process Order">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-info" title="Print Invoice">
+                                                    <i class="fas fa-print"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Order pagination">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Details - #ORD-1248</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Order details content would go here -->
+                    <p>Order details would be displayed here...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Print Invoice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>
