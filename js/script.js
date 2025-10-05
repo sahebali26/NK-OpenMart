@@ -4,6 +4,7 @@
 let currentUser = null;
 let cart = [];
 let wishlist = [];
+let products = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the application
@@ -30,23 +31,29 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    // Add to cart buttons
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const productName = this.getAttribute('data-name');
+    // Add to cart buttons - improved selector to work on all pages
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-to-cart')) {
+            const button = e.target.closest('.add-to-cart');
+            const productId = button.getAttribute('data-id');
+            const productName = button.getAttribute('data-name');
             addToCart(productId, productName);
-        });
-    });
-    
-    // Wishlist buttons
-    const wishlistButtons = document.querySelectorAll('.add-to-wishlist');
-    wishlistButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
+        }
+        
+        // Wishlist buttons - improved selector to work on all pages
+        if (e.target.closest('.add-to-wishlist')) {
+            const button = e.target.closest('.add-to-wishlist');
+            const productId = button.getAttribute('data-id');
             toggleWishlist(productId);
-        });
+        }
+        
+        // Buy Now buttons
+        if (e.target.closest('.buy-now')) {
+            const button = e.target.closest('.buy-now');
+            const productId = button.getAttribute('data-id');
+            const productName = button.getAttribute('data-name');
+            buyNow(productId, productName);
+        }
     });
     
     // Search functionality
@@ -67,9 +74,8 @@ function setupEventListeners() {
         newsletterForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const emailInput = this.querySelector('input[type="email"]');
-            if (emailInput && emailInput.value) {
-                subscribeToNewsletter(emailInput.value);
-                emailInput.value = '';
+            if (emailInput && emailInput.value.trim()) {
+                subscribeToNewsletter(emailInput.value.trim());
             }
         });
     }
@@ -77,25 +83,81 @@ function setupEventListeners() {
     // Product filters
     setupProductFilters();
     
-    // Review system
-    setupReviewSystem();
+    // Checkout form
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            processCheckout();
+        });
+    }
     
-    // Lazy loading for images
-    setupLazyLoading();
+    // Mobile filter toggle
+    const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+    if (mobileFilterToggle) {
+        mobileFilterToggle.addEventListener('click', function() {
+            const filterSidebar = document.getElementById('filter-sidebar');
+            if (filterSidebar) {
+                filterSidebar.classList.toggle('show');
+            }
+        });
+    }
+    
+    // Mobile filter close
+    const mobileFilterClose = document.getElementById('mobile-filter-close');
+    if (mobileFilterClose) {
+        mobileFilterClose.addEventListener('click', function() {
+            const filterSidebar = document.getElementById('filter-sidebar');
+            if (filterSidebar) {
+                filterSidebar.classList.remove('show');
+            }
+        });
+    }
 }
 
 function loadInitialData() {
-    // Load featured products
-    loadFeaturedProducts();
-    
-    // Load categories
-    loadCategories();
+    // Load products data
+    loadProducts();
     
     // Load cart count
     updateCartCount();
     
     // Load wishlist count
     updateWishlistCount();
+    
+    // Load order summary if on checkout page
+    if (window.location.pathname.includes('checkout.html')) {
+        renderOrderSummary();
+    }
+    
+    // Update product display based on current page
+    updateProductDisplayForCurrentPage();
+}
+
+// Product Management Functions
+function loadProducts() {
+    // Sample products data - in a real app, this would come from an API
+    products = [
+        { id: '1', name: 'Premium Lipstick', price: 499, comparePrice: 599, image: 'images/products/product1.jpg', category: 'Cosmetics', rating: 4.5, discount: 17 },
+        { id: '2', name: 'Designer Handbag', price: 1299, comparePrice: 1599, image: 'images/products/product2.jpg', category: 'Fashion', rating: 4.0, discount: 19 },
+        { id: '3', name: 'Silver Ring', price: 699, comparePrice: 899, image: 'images/products/product3.jpg', category: 'Fashion', rating: 4.2, discount: 22 },
+        { id: '4', name: 'Kitchen Utensil Set', price: 799, comparePrice: 999, image: 'images/products/product4.jpg', category: 'Daily Uses', rating: 5.0, discount: 20 },
+        { id: '5', name: 'Wireless Headphones', price: 1599, image: 'images/products/product5.jpg', category: 'Electronics', rating: 4.6, discount: 0 },
+        { id: '6', name: 'Smart Watch', price: 3499, image: 'images/products/product6.jpg', category: 'Electronics', rating: 4.3, discount: 0 },
+        { id: '7', name: 'Organic Face Cream', price: 349, comparePrice: 449, image: 'images/products/face-cream.jpg', category: 'Cosmetics', rating: 5.0, discount: 22 },
+        { id: '8', name: 'Complete Makeup Kit', price: 1499, comparePrice: 1999, image: 'images/products/makeup-kit.jpg', category: 'Cosmetics', rating: 4.0, discount: 25 },
+        { id: '9', name: 'Waterproof Eyeliner', price: 299, image: 'images/products/eyeliner.jpg', category: 'Cosmetics', rating: 3.5, discount: 0 },
+        { id: '10', name: 'Matte Foundation', price: 649, comparePrice: 799, image: 'images/products/foundation.jpg', category: 'Cosmetics', rating: 5.0, discount: 19 },
+        { id: '11', name: 'Gel Nail Polish Set', price: 899, image: 'images/products/nail-polish.jpg', category: 'Cosmetics', rating: 4.0, discount: 0 },
+        { id: '12', name: 'Volumizing Mascara', price: 349, comparePrice: 499, image: 'images/products/mascara.jpg', category: 'Cosmetics', rating: 3.5, discount: 30 },
+        { id: '13', name: 'Skincare Routine Set', price: 1299, image: 'images/products/skincare-set.jpg', category: 'Cosmetics', rating: 5.0, discount: 0 },
+        { id: '14', name: 'Elegant Ladies Watch', price: 2499, image: 'images/products/ladies-watch.jpg', category: 'Ladies Products', rating: 5.0, discount: 0 },
+        { id: '15', name: 'Designer Scarf Set', price: 799, image: 'images/products/scarf-set.jpg', category: 'Ladies Products', rating: 4.0, discount: 0 },
+        { id: '16', name: 'Pearl Jewelry Set', price: 999, comparePrice: 1299, image: 'images/products/jewelry-set.jpg', category: 'Ladies Products', rating: 4.5, discount: 23 },
+        { id: '17', name: 'Evening Clutch', price: 1099, image: 'images/products/clutch.jpg', category: 'Ladies Products', rating: 4.0, discount: 0 },
+        { id: '18', name: 'Hair Accessories Set', price: 499, comparePrice: 599, image: 'images/products/hair-accessories.jpg', category: 'Ladies Products', rating: 3.5, discount: 17 },
+        { id: '19', name: 'Designer Sunglasses', price: 1299, image: 'images/products/sunglasses.jpg', category: 'Ladies Products', rating: 5.0, discount: 0 }
+    ];
 }
 
 // User Authentication Functions
@@ -155,23 +217,13 @@ function addLogoutButton() {
     }
 }
 
-async function logout() {
-    try {
-        const response = await fetch('api/logout.php');
-        const result = await response.json();
-        
-        if (result.success) {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            showNotification('Logged out successfully', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-        showNotification('Logout failed', 'error');
-    }
+function logout() {
+    localStorage.removeItem('currentUser');
+    currentUser = null;
+    showNotification('Logged out successfully', 'success');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
 }
 
 // Cart Management Functions
@@ -184,11 +236,9 @@ function initializeCart() {
 }
 
 function addToCart(productId, productName = '') {
-    if (!currentUser) {
-        showNotification('Please login to add items to cart', 'warning');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        showNotification('Product not found', 'error');
         return;
     }
     
@@ -197,23 +247,18 @@ function addToCart(productId, productName = '') {
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
-        // Get product details (in real app, this would be from API)
-        const product = {
+        cart.push({
             id: productId,
-            name: productName || `Product ${productId}`,
-            price: getProductPrice(productId),
-            image: getProductImage(productId),
+            name: productName || product.name,
+            price: product.price,
+            image: product.image,
             quantity: 1
-        };
-        cart.push(product);
+        });
     }
     
     saveCart();
     updateCartDisplay();
-    showNotification('Product added to cart!', 'success');
-    
-    // Update cart via API
-    updateCartOnServer();
+    showNotification(`${productName || product.name} added to cart!`, 'success');
 }
 
 function removeFromCart(productId) {
@@ -221,9 +266,6 @@ function removeFromCart(productId) {
     saveCart();
     updateCartDisplay();
     showNotification('Product removed from cart', 'info');
-    
-    // Update cart via API
-    updateCartOnServer();
 }
 
 function updateCartItemQuantity(productId, quantity) {
@@ -235,9 +277,6 @@ function updateCartItemQuantity(productId, quantity) {
             item.quantity = quantity;
             saveCart();
             updateCartDisplay();
-            
-            // Update cart via API
-            updateCartOnServer();
         }
     }
 }
@@ -256,7 +295,7 @@ function updateCartDisplay() {
     
     // Update checkout page if we're on it
     if (window.location.pathname.includes('checkout.html')) {
-        renderCheckoutPage();
+        renderOrderSummary();
     }
 }
 
@@ -415,14 +454,6 @@ function initializeWishlist() {
 }
 
 function toggleWishlist(productId) {
-    if (!currentUser) {
-        showNotification('Please login to manage wishlist', 'warning');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
-        return;
-    }
-    
     const index = wishlist.indexOf(productId);
     
     if (index === -1) {
@@ -451,9 +482,6 @@ function toggleWishlist(productId) {
     
     saveWishlist();
     updateWishlistDisplay();
-    
-    // Update wishlist via API
-    updateWishlistOnServer();
 }
 
 function saveWishlist() {
@@ -467,6 +495,18 @@ function updateWishlistDisplay() {
     if (window.location.pathname.includes('wishlist.html')) {
         renderWishlistPage();
     }
+    
+    // Update wishlist buttons on all pages
+    document.querySelectorAll('.add-to-wishlist').forEach(button => {
+        const productId = button.getAttribute('data-id');
+        if (wishlist.includes(productId)) {
+            button.innerHTML = '<i class="fas fa-heart"></i>';
+            button.classList.add('active');
+        } else {
+            button.innerHTML = '<i class="far fa-heart"></i>';
+            button.classList.remove('active');
+        }
+    });
 }
 
 function updateWishlistCount() {
@@ -493,17 +533,10 @@ function renderWishlistPage() {
         return;
     }
     
-    // This would normally fetch product details from API
-    const sampleProducts = [
-        { id: '1', name: 'Premium Lipstick', price: 499, image: 'images/products/product1.jpg' },
-        { id: '2', name: 'Designer Handbag', price: 1299, image: 'images/products/product2.jpg' },
-        { id: '3', name: 'Silver Ring', price: 699, image: 'images/products/product3.jpg' }
-    ];
-    
     let html = '<div class="row">';
     
     wishlist.forEach(productId => {
-        const product = sampleProducts.find(p => p.id === productId);
+        const product = products.find(p => p.id === productId);
         if (product) {
             html += `
             <div class="col-md-4 mb-4">
@@ -514,6 +547,7 @@ function renderWishlistPage() {
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <span class="fw-bold price">₹${product.price}</span>
+                                ${product.comparePrice ? `<span class="compare-price text-muted text-decoration-line-through">₹${product.comparePrice}</span>` : ''}
                             </div>
                         </div>
                         <div class="d-flex justify-content-between">
@@ -548,35 +582,164 @@ function setupWishlistEventListeners() {
     });
 }
 
-// Product Management Functions
-function loadFeaturedProducts() {
-    // This would normally fetch from API
-    const featuredProductsContainer = document.getElementById('featured-products');
-    if (!featuredProductsContainer) return;
+// Product Filter Functions
+function setupProductFilters() {
+    const priceMin = document.getElementById('price-min');
+    const priceMax = document.getElementById('price-max');
+    const applyPrice = document.getElementById('apply-price');
+    const categoryFilters = document.querySelectorAll('input[type="checkbox"][id^="cat-"]');
+    const ratingFilters = document.querySelectorAll('input[type="checkbox"][id^="rating-"]');
+    const resetFilters = document.getElementById('reset-filters');
     
-    // Sample featured products data
-    const featuredProducts = [
-        { id: 1, name: 'Premium Lipstick', price: 499, comparePrice: 599, image: 'images/products/product1.jpg', rating: 4.5, discount: 17 },
-        { id: 2, name: 'Designer Handbag', price: 1299, comparePrice: 1599, image: 'images/products/product2.jpg', rating: 4.0, discount: 19 },
-        { id: 3, name: 'Silver Ring', price: 699, comparePrice: 899, image: 'images/products/product3.jpg', rating: 4.2, discount: 22 },
-        { id: 4, name: 'Kitchen Utensil Set', price: 799, comparePrice: 999, image: 'images/products/product4.jpg', rating: 5.0, discount: 20 }
-    ];
+    if (applyPrice) {
+        applyPrice.addEventListener('click', applyProductFilters);
+    }
+    
+    if (categoryFilters.length > 0) {
+        categoryFilters.forEach(filter => {
+            filter.addEventListener('change', applyProductFilters);
+        });
+    }
+    
+    if (ratingFilters.length > 0) {
+        ratingFilters.forEach(filter => {
+            filter.addEventListener('change', applyProductFilters);
+        });
+    }
+    
+    if (resetFilters) {
+        resetFilters.addEventListener('click', resetProductFilters);
+    }
+}
+
+function applyProductFilters() {
+    // Get filter values
+    const priceMin = document.getElementById('price-min')?.value || 0;
+    const priceMax = document.getElementById('price-max')?.value || Infinity;
+    const selectedCategories = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cat-"]:checked'))
+        .map(cb => cb.id.replace('cat-', ''));
+    const selectedRatings = Array.from(document.querySelectorAll('input[type="checkbox"][id^="rating-"]:checked'))
+        .map(cb => parseInt(cb.id.replace('rating-', '')));
+    
+    // Filter products
+    let filteredProducts = products.filter(product => {
+        // Price filter
+        if (product.price < priceMin || product.price > priceMax) return false;
+        
+        // Category filter
+        if (selectedCategories.length > 0 && !selectedCategories.includes('all')) {
+            if (!selectedCategories.includes(product.category.toLowerCase().replace(' ', '-'))) return false;
+        }
+        
+        // Rating filter
+        if (selectedRatings.length > 0) {
+            const minRating = Math.min(...selectedRatings);
+            if (product.rating < minRating) return false;
+        }
+        
+        return true;
+    });
+    
+    // Update product display
+    updateProductDisplay(filteredProducts);
+    showNotification(`Found ${filteredProducts.length} products`, 'success');
+    
+    // Close mobile filter sidebar after applying filters
+    const filterSidebar = document.getElementById('filter-sidebar');
+    if (filterSidebar && window.innerWidth < 992) {
+        filterSidebar.classList.remove('show');
+    }
+}
+
+function resetProductFilters() {
+    // Reset all filter inputs
+    const priceMin = document.getElementById('price-min');
+    const priceMax = document.getElementById('price-max');
+    
+    if (priceMin) priceMin.value = '';
+    if (priceMax) priceMax.value = '';
+    
+    document.querySelectorAll('input[type="checkbox"][id^="cat-"]').forEach(cb => {
+        cb.checked = cb.id === 'cat-all';
+    });
+    
+    document.querySelectorAll('input[type="checkbox"][id^="rating-"]').forEach(cb => {
+        cb.checked = false;
+    });
+    
+    // Show all products
+    updateProductDisplay(products);
+    showNotification('Filters reset', 'info');
+    
+    // Close mobile filter sidebar after resetting filters
+    const filterSidebar = document.getElementById('filter-sidebar');
+    if (filterSidebar && window.innerWidth < 992) {
+        filterSidebar.classList.remove('show');
+    }
+}
+
+// Add this function to handle page-specific product filtering
+function updateProductDisplayForCurrentPage() {
+    let filteredProducts = products;
+    
+    // Check which page we're on and filter accordingly
+    if (window.location.pathname.includes('cosmetics.html')) {
+        filteredProducts = products.filter(product => product.category === 'Cosmetics');
+    } else if (window.location.pathname.includes('ladies-products.html')) {
+        filteredProducts = products.filter(product => product.category === 'Ladies Products');
+    } else if (window.location.pathname.includes('daily-uses.html')) {
+        filteredProducts = products.filter(product => product.category === 'Daily Uses');
+    } else if (window.location.pathname.includes('electronics.html')) {
+        filteredProducts = products.filter(product => product.category === 'Electronics');
+    } else if (window.location.pathname.includes('fashion.html')) {
+        filteredProducts = products.filter(product => product.category === 'Fashion');
+    } else if (window.location.pathname.includes('products.html')) {
+        // All products page shows everything
+        filteredProducts = products;
+    }
+    
+    updateProductDisplay(filteredProducts);
+}
+
+function updateProductDisplay(filteredProducts) {
+    const productsGrid = document.getElementById('products-grid');
+    if (!productsGrid) return;
+    
+    if (filteredProducts.length === 0) {
+        productsGrid.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>No products found</h4>
+                <p class="text-muted">Try adjusting your filters or browse other categories</p>
+                <a href="../index.html" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        `;
+        
+        // Update product count
+        const productCount = document.getElementById('product-count');
+        if (productCount) {
+            productCount.textContent = '0 products';
+        }
+        
+        // Update category badge count
+        updateCategoryBadgeCount(0);
+        return;
+    }
     
     let html = '';
-    featuredProducts.forEach(product => {
+    
+    filteredProducts.forEach(product => {
         html += `
-        <div class="col-md-3 mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card product-card">
-                ${product.discount ? `<div class="discount">${product.discount}% OFF</div>` : ''}
+                ${product.discount ? `<div class="badge bg-danger position-absolute top-0 end-0 m-2">${product.discount}% OFF</div>` : ''}
                 <img src="${product.image}" class="card-img-top" alt="${product.name}">
                 <div class="card-body">
                     <h5 class="card-title">${product.name}</h5>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
-                            ${product.comparePrice ? `
-                                <span class="compare-price text-muted text-decoration-line-through">₹${product.comparePrice}</span>
-                            ` : ''}
-                            <span class="fw-bold price ms-2">₹${product.price}</span>
+                            ${product.comparePrice ? `<span class="text-muted text-decoration-line-through">₹${product.comparePrice}</span>` : ''}
+                            <span class="fw-bold ms-2 price">₹${product.price}</span>
                         </div>
                         <div class="rating">
                             ${generateStarRating(product.rating)}
@@ -586,8 +749,11 @@ function loadFeaturedProducts() {
                         <button class="btn btn-sm btn-primary add-to-cart" data-id="${product.id}" data-name="${product.name}">
                             Add to Cart
                         </button>
-                        <button class="btn btn-sm btn-outline-danger add-to-wishlist ${wishlist.includes(product.id.toString()) ? 'active' : ''}" data-id="${product.id}">
-                            <i class="${wishlist.includes(product.id.toString()) ? 'fas' : 'far'} fa-heart"></i>
+                        <button class="btn btn-sm btn-outline-danger add-to-wishlist ${wishlist.includes(product.id) ? 'active' : ''}" data-id="${product.id}">
+                            <i class="${wishlist.includes(product.id) ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success buy-now" data-id="${product.id}" data-name="${product.name}">
+                            Buy Now
                         </button>
                     </div>
                 </div>
@@ -596,304 +762,62 @@ function loadFeaturedProducts() {
         `;
     });
     
-    featuredProductsContainer.innerHTML = html;
+    productsGrid.innerHTML = html;
+    
+    // Update product count
+    const productCount = document.getElementById('product-count');
+    if (productCount) {
+        productCount.textContent = `${filteredProducts.length} products`;
+    }
+    
+    // Update category badge count
+    updateCategoryBadgeCount(filteredProducts.length);
 }
 
-function loadCategories() {
-    // This would normally fetch from API
-    const categoriesContainer = document.getElementById('categories-container');
-    if (!categoriesContainer) return;
-    
-    const categories = [
-        { name: 'Cosmetics', image: 'images/categories/cosmetics.jpg', link: 'categories/cosmetics.html' },
-        { name: 'Ladies Products', image: 'images/categories/ladies-products.jpg', link: 'categories/ladies-products.html' },
-        { name: 'Daily Uses', image: 'images/categories/daily-uses.jpg', link: 'categories/daily-uses.html' }
-    ];
-    
-    let html = '';
-    categories.forEach(category => {
-        html += `
-        <div class="col-md-4 mb-4">
-            <div class="card category-card">
-                <img src="${category.image}" class="card-img-top" alt="${category.name}">
-                <div class="card-body text-center">
-                    <h5 class="card-title">${category.name}</h5>
-                    <a href="${category.link}" class="btn btn-outline-primary">View Products</a>
-                </div>
-            </div>
-        </div>
-        `;
-    });
-    
-    categoriesContainer.innerHTML = html;
-}
-
-function setupProductFilters() {
-    const priceFilter = document.getElementById('price-filter');
-    const categoryFilter = document.getElementById('category-filter');
-    const sortSelect = document.getElementById('sort-select');
-    const searchInput = document.getElementById('search-input');
-    
-    if (priceFilter) {
-        priceFilter.addEventListener('change', applyProductFilters);
-    }
-    if (categoryFilter) {
-        categoryFilter.addEventListener('change', applyProductFilters);
-    }
-    if (sortSelect) {
-        sortSelect.addEventListener('change', applyProductFilters);
-    }
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(applyProductFilters, 300));
+// Add this function to update category badge counts
+function updateCategoryBadgeCount(count) {
+    // Update the category page badge
+    const categoryBadge = document.querySelector('.badge.bg-primary');
+    if (categoryBadge) {
+        categoryBadge.textContent = `${count} Products`;
     }
 }
 
-function applyProductFilters() {
-    // This would normally make an API call with filter parameters
-    showNotification('Applying filters...', 'info');
-    
-    // Simulate API call delay
-    setTimeout(() => {
-        showNotification('Filters applied successfully', 'success');
-    }, 500);
-}
-
+// Search Function
 function searchProducts(query) {
     if (query.trim()) {
-        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
-    }
-}
-
-// Utility Functions
-function generateStarRating(rating) {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-    
-    let stars = '';
-    
-    // Full stars
-    for (let i = 0; i < fullStars; i++) {
-        stars += '<i class="fas fa-star text-warning"></i>';
-    }
-    
-    // Half star
-    if (halfStar) {
-        stars += '<i class="fas fa-star-half-alt text-warning"></i>';
-    }
-    
-    // Empty stars
-    for (let i = 0; i < emptyStars; i++) {
-        stars += '<i class="far fa-star text-warning"></i>';
-    }
-    
-    return stars;
-}
-
-function getProductPrice(productId) {
-    // This would normally fetch from API
-    const prices = {
-        '1': 499,
-        '2': 1299,
-        '3': 699,
-        '4': 799
-    };
-    return prices[productId] || 0;
-}
-
-function getProductImage(productId) {
-    // This would normally fetch from API
-    const images = {
-        '1': 'images/products/product1.jpg',
-        '2': 'images/products/product2.jpg',
-        '3': 'images/products/product3.jpg',
-        '4': 'images/products/product4.jpg'
-    };
-    return images[productId] || 'images/products/default.jpg';
-}
-
-function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notification => {
-        notification.remove();
-    });
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} notification`;
-    notification.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="fas fa-${getNotificationIcon(type)} me-2"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    // Add to document
-    document.body.appendChild(notification);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }
-    }, 3000);
-}
-
-function getNotificationIcon(type) {
-    const icons = {
-        'success': 'check-circle',
-        'error': 'exclamation-circle',
-        'warning': 'exclamation-triangle',
-        'info': 'info-circle'
-    };
-    return icons[type] || 'info-circle';
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-function setupLazyLoading() {
-    if ('IntersectionObserver' in window) {
-        const lazyImages = document.querySelectorAll('img.lazy-load');
+        // Filter products based on search query
+        const filteredProducts = products.filter(product => 
+            product.name.toLowerCase().includes(query.toLowerCase()) ||
+            product.category.toLowerCase().includes(query.toLowerCase())
+        );
         
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.add('loaded');
-                    imageObserver.unobserve(img);
-                }
-            });
-        });
-        
-        lazyImages.forEach(img => {
-            imageObserver.observe(img);
-        });
+        // Update product display
+        updateProductDisplay(filteredProducts);
+        showNotification(`Found ${filteredProducts.length} products for "${query}"`, 'success');
     }
 }
 
-function setupReviewSystem() {
-    const reviewForm = document.getElementById('review-form');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitReview();
-        });
-    }
-}
-
-function submitReview() {
-    if (!currentUser) {
-        showNotification('Please login to submit a review', 'warning');
-        return;
-    }
+// Buy Now Function
+function buyNow(productId, productName) {
+    // Clear cart and add only this product
+    cart = [{
+        id: productId,
+        name: productName,
+        price: getProductPrice(productId),
+        image: getProductImage(productId),
+        quantity: 1
+    }];
     
-    const form = document.getElementById('review-form');
-    const formData = new FormData(form);
+    saveCart();
+    updateCartDisplay();
     
-    const reviewData = {
-        productId: formData.get('product-id'),
-        rating: formData.get('rating'),
-        title: formData.get('title'),
-        comment: formData.get('comment')
-    };
-    
-    // This would normally be an API call
-    console.log('Submitting review:', reviewData);
-    showNotification('Thank you for your review!', 'success');
-    form.reset();
-}
-
-// API Integration Functions
-async function updateCartOnServer() {
-    if (!currentUser) return;
-    
-    try {
-        const response = await fetch('api/cart.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'sync',
-                cart: cart
-            })
-        });
-        
-        const result = await response.json();
-        if (!result.success) {
-            console.error('Failed to sync cart with server');
-        }
-    } catch (error) {
-        console.error('Error syncing cart:', error);
-    }
-}
-
-async function updateWishlistOnServer() {
-    if (!currentUser) return;
-    
-    try {
-        const response = await fetch('api/wishlist.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'sync',
-                wishlist: wishlist
-            })
-        });
-        
-        const result = await response.json();
-        if (!result.success) {
-            console.error('Failed to sync wishlist with server');
-        }
-    } catch (error) {
-        console.error('Error syncing wishlist:', error);
-    }
-}
-
-async function subscribeToNewsletter(email) {
-    try {
-        const response = await fetch('api/newsletter.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification('Thank you for subscribing to our newsletter!', 'success');
-        } else {
-            showNotification(result.message, 'error');
-        }
-    } catch (error) {
-        console.error('Newsletter subscription error:', error);
-        showNotification('Subscription failed. Please try again.', 'error');
-    }
+    // Redirect to checkout page
+    window.location.href = 'checkout.html';
 }
 
 // Checkout Functions
-function renderCheckoutPage() {
+function renderOrderSummary() {
     const orderSummary = document.getElementById('order-summary');
     if (!orderSummary) return;
     
@@ -927,9 +851,10 @@ function renderCheckoutPage() {
         `;
     });
     
-    const shipping = subtotal > 500 ? 0 : 50;
+    const shippingMethod = document.getElementById('shippingMethod');
+    const shippingCost = shippingMethod ? getShippingCost(shippingMethod.value) : 50;
     const tax = subtotal * 0.18;
-    const total = subtotal + shipping + tax;
+    const total = subtotal + shippingCost + tax;
     
     html += `
     <div class="d-flex justify-content-between mb-2">
@@ -938,10 +863,10 @@ function renderCheckoutPage() {
     </div>
     <div class="d-flex justify-content-between mb-2">
         <span>Shipping:</span>
-        <span>${shipping === 0 ? 'Free' : '₹' + shipping.toFixed(2)}</span>
+        <span>₹${shippingCost.toFixed(2)}</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <span>Tax:</span>
+        <span>Tax (18%):</span>
         <span>₹${tax.toFixed(2)}</span>
     </div>
     <hr>
@@ -952,14 +877,251 @@ function renderCheckoutPage() {
     `;
     
     orderSummary.innerHTML = html;
+    
+    // Update shipping cost when method changes
+    if (shippingMethod) {
+        shippingMethod.addEventListener('change', function() {
+            renderOrderSummary();
+        });
+    }
 }
 
-// Export functions for use in other modules
-window.OpenMart = {
-    addToCart,
-    removeFromCart,
-    toggleWishlist,
-    showNotification,
-    updateCartCount,
-    updateWishlistCount
-};
+function getShippingCost(method) {
+    const costs = {
+        'standard': 50,
+        'express': 150,
+        'overnight': 300
+    };
+    return costs[method] || 50;
+}
+
+function processCheckout() {
+    // Validate form
+    if (!validateCheckoutForm()) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Collect order data
+    const orderData = collectOrderData();
+    
+    // Submit order to WhatsApp
+    submitOrderToWhatsApp(orderData);
+}
+
+function validateCheckoutForm() {
+    const requiredFields = document.querySelectorAll('#checkoutForm [required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    return isValid;
+}
+
+function collectOrderData() {
+    const form = document.getElementById('checkoutForm');
+    const formData = new FormData(form);
+    
+    // Calculate order totals
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingMethod = document.getElementById('shippingMethod').value;
+    const shippingCost = getShippingCost(shippingMethod);
+    const tax = subtotal * 0.18;
+    const total = subtotal + shippingCost + tax;
+    
+    return {
+        customer: {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            city: formData.get('city'),
+            state: formData.get('state'),
+            zip: formData.get('zip')
+        },
+        order: {
+            items: cart,
+            subtotal: subtotal,
+            shipping: shippingCost,
+            tax: tax,
+            total: total,
+            shippingMethod: shippingMethod,
+            orderDate: new Date().toLocaleDateString()
+        }
+    };
+}
+
+function submitOrderToWhatsApp(orderData) {
+    // Format the message for WhatsApp
+    const message = formatWhatsAppMessage(orderData);
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // WhatsApp API URL
+    const phoneNumber = '+916003816583';
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappURL, '_blank');
+    
+    // Show success message
+    showNotification('Order submitted successfully! Opening WhatsApp...', 'success');
+    
+    // Clear cart after successful order
+    setTimeout(() => {
+        cart = [];
+        saveCart();
+        updateCartDisplay();
+    }, 2000);
+}
+
+function formatWhatsAppMessage(orderData) {
+    const { customer, order } = orderData;
+    
+    let message = `*NEW ORDER - OpenMart*\n\n`;
+    message += `*Customer Details:*\n`;
+    message += `Name: ${customer.name}\n`;
+    message += `Email: ${customer.email}\n`;
+    message += `Phone: ${customer.phone}\n`;
+    message += `Address: ${customer.address}, ${customer.city}, ${customer.state} - ${customer.zip}\n\n`;
+    
+    message += `*Order Details:*\n`;
+    order.items.forEach(item => {
+        message += `- ${item.name} (Qty: ${item.quantity}) - ₹${(item.price * item.quantity).toFixed(2)}\n`;
+    });
+    
+    message += `\n*Order Summary:*\n`;
+    message += `Subtotal: ₹${order.subtotal.toFixed(2)}\n`;
+    message += `Shipping (${order.shippingMethod}): ₹${order.shipping.toFixed(2)}\n`;
+    message += `Tax: ₹${order.tax.toFixed(2)}\n`;
+    message += `*Total: ₹${order.total.toFixed(2)}*\n\n`;
+    message += `Order Date: ${order.orderDate}\n\n`;
+    message += `Thank you for your order!`;
+    
+    return message;
+}
+
+// Utility Functions
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        notification.remove();
+    });
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} notification`;
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas ${getNotificationIcon(type)} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Position notification
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+function getNotificationIcon(type) {
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-circle',
+        'warning': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle'
+    };
+    return icons[type] || 'fa-info-circle';
+}
+
+function generateStarRating(rating) {
+    let stars = '';
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+    for (let i = 1; i <= 5; i++) {
+        if (i <= fullStars) {
+            stars += '<i class="fas fa-star"></i>';
+        } else if (i === fullStars + 1 && hasHalfStar) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+            stars += '<i class="far fa-star"></i>';
+        }
+    }
+    
+    return stars;
+}
+
+function getProductPrice(productId) {
+    const product = products.find(p => p.id === productId);
+    return product ? product.price : 0;
+}
+
+function getProductImage(productId) {
+    const product = products.find(p => p.id === productId);
+    return product ? product.image : '';
+}
+
+// Newsletter Subscription
+function subscribeToNewsletter(email) {
+    // In a real application, this would send the email to a server
+    const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
+    
+    if (!subscribers.includes(email)) {
+        subscribers.push(email);
+        localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
+        showNotification('Thank you for subscribing to our newsletter!', 'success');
+    } else {
+        showNotification('You are already subscribed to our newsletter.', 'info');
+    }
+    
+    // Clear the input
+    const emailInput = document.querySelector('.newsletter-form input[type="email"]');
+    if (emailInput) {
+        emailInput.value = '';
+    }
+}
+
+// Handle page-specific initialization
+function initializePage() {
+    const path = window.location.pathname;
+    
+    if (path.includes('categories/') || path.includes('products.html')) {
+        // Initialize category page with filtered products
+        updateProductDisplayForCurrentPage();
+    } else if (path.includes('cart.html')) {
+        // Initialize cart page
+        renderCartPage();
+    } else if (path.includes('wishlist.html')) {
+        // Initialize wishlist page
+        renderWishlistPage();
+    } else if (path.includes('checkout.html')) {
+        // Initialize checkout page
+        renderOrderSummary();
+    }
+}
+
+// Call page initialization when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializePage);

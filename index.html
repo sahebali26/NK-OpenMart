@@ -23,8 +23,6 @@
                 <div class="col-md-6 text-md-end">
                     <div class="d-flex gap-3 justify-content-md-end">
                         <span><i class="fas fa-phone me-1"></i> +91 6003816583</span>
-                        <a href="login.html" class="login-link"><i class="fas fa-user me-1"></i> Login</a>
-                        <a href="register.html" class="register-link">Register</a>
                     </div>
                 </div>
             </div>
@@ -108,17 +106,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="products.html">All Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="about.html">About Us</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profile.html" style="display: none;">
-                                <i class="fas fa-user me-1"></i> Profile
-                            </a>
                         </li>
                     </ul>
                 </div>
@@ -211,7 +198,7 @@
         <div class="container">
             <h2 class="text-center mb-5">Shop by Category</h2>
             <div class="row" id="categories-container">
-                <!-- Categories will be loaded by JavaScript -->
+                <!-- Categories will be added here -->
             </div>
         </div>
     </section>
@@ -228,8 +215,53 @@
                     <a href="products.html" class="btn btn-outline-primary">View All Products</a>
                 </div>
             </div>
-            <div class="row" id="featured-products">
-                <!-- Products will be loaded by JavaScript -->
+            
+            <!-- Cosmetics Products -->
+            <div class="category-section mb-5">
+                <div class="category-header position-relative mb-4">
+                    <div class="category-banner" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/categories/cosmetics-banner.jpg'); background-size: cover; background-position: center; height: 200px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-white">
+                            <h3 class="mb-2">Cosmetics Collection</h3>
+                            <p class="mb-3">Premium beauty products for your perfect look</p>
+                            <a href="categories/cosmetics.html" class="btn btn-light">View All Cosmetics</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="cosmetics-products">
+                    <!-- Cosmetics products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Fashion Products -->
+            <div class="category-section mb-5">
+                <div class="category-header position-relative mb-4">
+                    <div class="category-banner" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/categories/fashion-banner.jpg'); background-size: cover; background-position: center; height: 200px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-white">
+                            <h3 class="mb-2">Fashion Collection</h3>
+                            <p class="mb-3">Trendy styles for every occasion</p>
+                            <a href="categories/fashion.html" class="btn btn-light">View All Fashion</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="fashion-products">
+                    <!-- Fashion products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Daily Uses Products -->
+            <div class="category-section">
+                <div class="category-header position-relative mb-4">
+                    <div class="category-banner" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/categories/daily-uses-banner.jpg'); background-size: cover; background-position: center; height: 200px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-white">
+                            <h3 class="mb-2">Daily Uses Collection</h3>
+                            <p class="mb-3">Essential products for everyday life</p>
+                            <a href="categories/daily-uses.html" class="btn btn-light">View All Daily Uses</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="daily-uses-products">
+                    <!-- Daily uses products will be loaded here -->
+                </div>
             </div>
         </div>
     </section>
