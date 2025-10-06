@@ -138,11 +138,11 @@ function loadInitialData() {
 function loadProducts() {
     // Sample products data - in a real app, this would come from an API
     products = [
-        { id: '1', name: 'Premium Lipstick', price: 499, comparePrice: 599, image: 'images/products/product1.jpg', category: 'Cosmetics', rating: 4.5, discount: 17 },
-        { id: '2', name: 'Designer Handbag', price: 1299, comparePrice: 1599, image: 'images/products/product2.jpg', category: 'Fashion', rating: 4.0, discount: 19 },
-        { id: '3', name: 'Silver Ring', price: 699, comparePrice: 899, image: 'images/products/product3.jpg', category: 'Fashion', rating: 4.2, discount: 22 },
-        { id: '4', name: 'Kitchen Utensil Set', price: 799, comparePrice: 999, image: 'images/products/product4.jpg', category: 'Daily Uses', rating: 5.0, discount: 20 },
-        { id: '5', name: 'Wireless Headphones', price: 1599, image: 'images/products/product5.jpg', category: 'Electronics', rating: 4.6, discount: 0 },
+        { id: '1', name: 'Premium Lipstick', price: 499, comparePrice: 599, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpc3AXiXeCbq9t0NI2kpm5Wusc5-stOUwZFQ&s', category: 'Cosmetics', rating: 4.5, discount: 17 },
+        { id: '2', name: 'Designer Handbag', price: 1299, comparePrice: 1599, image: 'https://img.lazcdn.com/g/p/ac352cbdfb1cc2c828207c61040f8fc1.jpg_720x720q80.jpg', category: 'Fashion', rating: 4.0, discount: 19 },
+        { id: '3', name: 'Silver Ring', price: 699, comparePrice: 899, image: 'https://salty.co.in/cdn/shop/files/RS13537-S_d625fa69-0d20-49c1-9dfb-4ad9740aa3e2.jpg?v=1753113851&width=1080', category: 'Fashion', rating: 4.2, discount: 22 },
+        { id: '4', name: 'Kitchen Utensil Set', price: 799, comparePrice: 999, image: 'https://images-cdn.ubuy.co.in/689fdf9913552c042402a866-18-10-stainless-steel-kitchen-utensils.jpg', category: 'Daily Uses', rating: 5.0, discount: 20 },
+        { id: '5', name: 'Wireless Headphones', price: 1599, image: 'https://www.beatsbydre.com/content/dam/beats/web/product/headphones/solo4-wireless/pdp/product-carousel/cloud-pink/pink-01-solo4.jpg', category: 'Electronics', rating: 4.6, discount: 0 },
         { id: '6', name: 'Smart Watch', price: 3499, image: 'images/products/product6.jpg', category: 'Electronics', rating: 4.3, discount: 0 },
         { id: '7', name: 'Organic Face Cream', price: 349, comparePrice: 449, image: 'images/products/face-cream.jpg', category: 'Cosmetics', rating: 5.0, discount: 22 },
         { id: '8', name: 'Complete Makeup Kit', price: 1499, comparePrice: 1999, image: 'images/products/makeup-kit.jpg', category: 'Cosmetics', rating: 4.0, discount: 25 },
